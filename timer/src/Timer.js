@@ -39,9 +39,11 @@ class InputGroup extends React.Component {
     return isNumeric(value) && value < 60 && value >= 0;
   }
   handleAddTimer() {
-    let ms = (this.state.min * 60 + this.state.sec) * 1000;
-    this.props.onAddTimer(ms);
-    this.resetInputs();
+  	if (this.isValueValid(this.state.min) && this.isValueValid(this.state.sec)){
+	    let ms = (this.state.min * 60 + this.state.sec) * 1000;
+	    this.props.onAddTimer(ms);
+	    this.resetInputs();
+	  }
   }
   resetInputs() {
     this.setState({
