@@ -10,63 +10,55 @@ class InputGroup extends React.Component {
     super();
     this.state = {
       min: '',
-      sec: '',
-      validating: false,
-      minValid: false,
-      secValid: false
+      sec: ''
     }
   }
   handleChangeMin(event) {
-    let min = isNumeric(event.target.value) ? parseInt(event.target.value, 10) : '';
-    this.setState({
-      min: min
-    });
-  }
+    if (this.isValueValid(event.target.value)){
+      this.setState({
+        min: parseInt(event.target.value, 10)
+      })
+    } else {
+      this.setState({
+        min: ''
+      })
+    }
+  } 
   handleChangeSec(event) {
-    let sec = isNumeric(event.target.value) ? parseInt(event.target.value, 10) : '';
-    this.setState({
-      sec: sec
-    });
+    if (this.isValueValid(event.target.value)){
+      this.setState({
+        sec: parseInt(event.target.value, 10)
+      })
+    } else {
+      this.setState({
+        sec: ''
+      })
+    }
   }
-  validateInputs(){
-    let minValid = this.state.min < 60 && this.state.min >= 0 ? true : false;
-    let secValid = this.state.sec < 60 && this.state.sec >= 0 ? true : false;
-    this.setState({
-      validating: true,
-      minValid: minValid,
-      secValid: secValid
-    });
+  isValueValid(value){    
+    return isNumeric(value) && value < 60 && value >= 0;
   }
   handleAddTimer() {
-    this.validateInputs();
-    if (this.state.minValid && this.state.secValid){
-      let ms = (this.state.min * 60 + this.state.sec) * 1000;
-      this.props.onAddTimer(ms);
-      this.resetInputs();
-    }
+    let ms = (this.state.min * 60 + this.state.sec) * 1000;
+    this.props.onAddTimer(ms);
+    this.resetInputs();
   }
   resetInputs() {
     this.setState({
       min: '',
-      sec: '',
-      validating: false,
-      minValid: false,
-      secValid: false
+      sec: ''
     })
   }
-
 
   render() {
     return (
       <div className="input-group">
         <input 
-          className={this.state.validating && !this.state.minValid ? "error" : ""}
           type="text" 
           placeholder="Min" 
           value={this.state.min} 
           onChange={this.handleChangeMin.bind(this)} />
         <input 
-          className={this.state.validating && !this.state.secValid ? "error" : ""}
           type="text" 
           placeholder="Sec" 
           value={this.state.sec} 
