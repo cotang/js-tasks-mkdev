@@ -1,11 +1,12 @@
-Array.prototype.Rmap = function (fn) {  
-  if (this.length == 1) {
-    // console.log('end', this);
-    return fn(this);
+Array.prototype.Rmap = function (fn) {
+	let arr = this.slice();
+  if (arr.length == 1) {
+    // console.log('end', arr);
+    return fn(arr);
   } else {
-    var firstEl = fn(this.shift());
-    // console.log('stack', firstEl, this, this[0], fn(this[0]));
-    return [firstEl].concat(this.Rmap(fn))
+    var firstEl = fn(arr.shift());
+    // console.log('stack', firstEl, arr, arr[0], fn(arr[0]));
+    return [firstEl].concat(arr.Rmap(fn))
   }
 };
 

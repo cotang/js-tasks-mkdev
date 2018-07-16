@@ -1,16 +1,17 @@
-Array.prototype.Rfilter = function (fn) { 
-  // console.log(fn(this[0]), fn(this[this.length-1]))
-  if (this.length == 1) {
-    // console.log('end', this);
-    if(fn(this)) return this;
+Array.prototype.Rfilter = function (fn) {
+  let arr = this.slice();
+  // console.log(fn(arr[0]), fn(arr[arr.length-1]))
+  if (arr.length == 1) {
+    // console.log('end', arr);
+    if(fn(arr)) return arr;
   } else {
-    var firstEl = this.shift();
+    var firstEl = arr.shift();
     var isFiltered = fn(firstEl);
-    // console.log('stack', firstEl, this, this[0], fn(this[0]));
+    // console.log('stack', firstEl, arr, arr[0], fn(arr[0]));
     if (isFiltered){    
-      return [firstEl].concat(this.Rfilter(fn))
+      return [firstEl].concat(arr.Rfilter(fn))
     } else {
-      return [].concat(this.Rfilter(fn))
+      return [].concat(arr.Rfilter(fn))
     }
   }
 };
