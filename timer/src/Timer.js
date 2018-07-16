@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import './Timer.css';
 
-function isNumeric(n) {
-  return !isNaN(parseFloat(n)) && isFinite(n);
+function isValueValid(value){    
+  return !isNaN(parseFloat(value)) && isFinite(value) && value < 60 && value >= 0;
 }
 
 class InputGroup extends React.Component {
@@ -14,7 +14,7 @@ class InputGroup extends React.Component {
     }
   }
   handleChangeMin(event) {
-    if (this.isValueValid(event.target.value)){
+    if (isValueValid(event.target.value)){
       this.setState({
         min: parseInt(event.target.value, 10)
       })
@@ -23,9 +23,9 @@ class InputGroup extends React.Component {
         min: ''
       })
     }
-  } 
+  }
   handleChangeSec(event) {
-    if (this.isValueValid(event.target.value)){
+    if (isValueValid(event.target.value)){
       this.setState({
         sec: parseInt(event.target.value, 10)
       })
@@ -35,11 +35,8 @@ class InputGroup extends React.Component {
       })
     }
   }
-  isValueValid(value){    
-    return isNumeric(value) && value < 60 && value >= 0;
-  }
   handleAddTimer() {
-  	if (this.isValueValid(this.state.min) && this.isValueValid(this.state.sec)){
+  	if (isValueValid(this.state.min) && isValueValid(this.state.sec)){
 	    let ms = (this.state.min * 60 + this.state.sec) * 1000;
 	    this.props.onAddTimer(ms);
 	    this.resetInputs();
