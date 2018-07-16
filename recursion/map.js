@@ -1,5 +1,5 @@
 Array.prototype.Rmap = function (fn) {
-	let arr = this.slice();
+  let arr = this.slice();
   if (arr.length == 1) {
     // console.log('end', arr);
     return fn(arr);

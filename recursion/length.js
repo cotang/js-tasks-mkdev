@@ -1,7 +1,25 @@
-// Array.prototype.Rlength = function(){
-//   return this;
-// };
-Array.prototype.Rlength = this;
+Array.prototype.Rlength = function() {
+  let arr = this.slice();
+  let l = 0
+  if (arr[0] == undefined) {
+    return l
+  } else {
+    l++;
+    arr.shift();
+    return l+arr.Rlength()
+  }  
+};
 
-var res = [5,6,2,7].Rlength;
-console.log('result', res);
+
+console.log('result', [10,20,30,10,500].Rlength())
+console.log('result', [10].Rlength())
+console.log('result', [].Rlength())
+
+
+// Array.prototype.Rlength = function () {
+//   var l = 0;
+//   for(let i = 0; i < this.length; i++) {
+//     l++
+//   }
+//   return l;
+// };
