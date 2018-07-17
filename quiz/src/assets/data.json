@@ -1,0 +1,22 @@
+{
+  "title": "How to win a quiz.",
+  "questions": [
+    {
+      "question": "What is a capital of Great Britian?",
+      "answers": [
+        {
+          "is_right": true,
+          "value": "London"
+        },
+        {
+          "is_right": false,
+          "value": "Paris"
+        },
+        {
+          "is_right": false,
+          "value": "Berlin"
+        }
+      ]
+    }
+  ]
+}
