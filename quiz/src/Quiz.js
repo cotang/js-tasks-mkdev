@@ -12,10 +12,13 @@ class Question extends React.Component {
   handleChangeRadio(event) {
     this.setState({
       answer: event.target.value,
-    })    
+    }) 
   }
   handleQuestionAnswer() {
     this.props.onOptionChoice(this.state.answer);
+    this.setState({
+      answer: null
+    }) 
   }
 
 
@@ -25,25 +28,29 @@ class Question extends React.Component {
 
     return (
       <div className="question">
-        <h3 className="question-title">{title}</h3>
+        <h3 className="question-title">
+          <small>Question#{this.props.step+1}</small><br/>
+          <big>{title}</big>
+        </h3>
         <ul className="question-options">
           {options.map((opt, j) => 
-            <li key={j}>
+            <li className="question-option" key={j}>
               <input
                 type="radio"
                 id={"radio"+this.props.step+j}
                 value={opt.is_right}
+                checked={String(opt.is_right) === this.state.answer}
                 name={"radio"+this.props.step}                
                 onChange={this.handleChangeRadio.bind(this)} />
               <label htmlFor={"radio"+this.props.step+j}>{opt.value}</label>
             </li> 
           )}
         </ul>
-
+        { (this.state.answer != null) ?
           <button className="btn" onClick={this.handleQuestionAnswer.bind(this)}>
             { (this.props.step === this.props.amount-1) ? "Results" : "Next"}
           </button>
-
+        : '' }
       </div>
     );
   }
@@ -60,14 +67,17 @@ class Quiz extends React.Component {
       step: 0
     };
   }
-  writeDownAnswer(answer){
-    let answers = this.state.user_answers;
-    answers.push(answer);    
+  writeDownAnswer(answer){  
     this.setState({
-      user_answers: answers,
+      user_answers: [...this.state.user_answers, answer],
       step: this.state.step + 1
     })
-    console.log(this.state.user_answers)
+  }
+  handleReset(){
+    this.setState({
+      user_answers:[],
+      step: 0
+    });
   }
   componentDidMount() {
     // v1 fetch
@@ -97,7 +107,7 @@ class Quiz extends React.Component {
 
       return (
         <section className="quiz">          
-          <h2>{this.state.quiz_data.title}</h2>
+          <h2 className="quiz-title">{this.state.quiz_data.title}</h2>
 
           { (this.state.step !== questions.length) ?
             <div className="quiz-questions">
@@ -116,9 +126,10 @@ class Quiz extends React.Component {
             <div className="quiz-results">
               <ul>
               {this.state.user_answers.map((el, i) => 
-                <li key={i}>Вопрос №{i+1} - ответ { (String(el) === "true") ? 'правильный' : 'неправильный' }</li>
+                <li key={i}>Question №{i+1} - the answer is { (String(el) === "true") ? 'correct' : 'incorrect' }</li>
               )}
               </ul>
+              <button className="btn" onClick={this.handleReset.bind(this)}>Try Again</button>
             </div>
           }
         </section>
