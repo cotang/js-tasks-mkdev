@@ -1,0 +1,6 @@
+.weather-block span{
+	display: inline-block;
+}
+.weather-block img{
+	vertical-align: middle;
+}
