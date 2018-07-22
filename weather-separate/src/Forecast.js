@@ -21,7 +21,7 @@ class Forecast extends Component {
         initialLat: position.coords.latitude,
         initialLng: position.coords.longitude
       })
-      this.loadLocationData(this.state.initialLat, this.state.initialLng)
+      this.loadLocationData(position.coords.latitude, position.coords.longitude)
     }
   }
   loadLocationData(lat, lng){

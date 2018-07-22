@@ -9,8 +9,7 @@ class Menu extends Component {
       <section className="main-menu">
         <Container>
           <Nav>
-            <NavItem><Link className="nav-link" to="/">Root</Link></NavItem>
-            <NavItem><Link className="nav-link" to="/weather">Weather</Link></NavItem>
+            <NavItem><Link className="nav-link" to="/">Weather</Link></NavItem>
             <NavItem><Link className="nav-link" to="/forecast">Forecast</Link></NavItem>
             <NavItem><Link className="nav-link" to="/about">About</Link></NavItem>
           </Nav>

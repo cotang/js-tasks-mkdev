@@ -8,7 +8,6 @@ import Forecast from './Forecast';
 import Weather from './Weather';
 
 import './index.css';
-import App from './App';
 import registerServiceWorker from './registerServiceWorker';
 
 import '../node_modules/bootstrap/dist/css/bootstrap.min.css';
@@ -20,10 +19,9 @@ ReactDOM.render(
     <div>
       <Menu />
       <Switch>
-	      <Route exact path="/" component={App} />  
-        <Route path="/weather" component={Weather} /> 
+        <Route exact path="/" component={Weather} /> 
         <Route path="/forecast" component={Forecast} /> 
-	      <Route path="/about" component={About}/>   
+        <Route path="/about" component={About}/>   
       </Switch>   
     </div>
   </HashRouter>,

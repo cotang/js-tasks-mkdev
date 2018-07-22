@@ -19,11 +19,10 @@ ReactDOM.render(
   <HashRouter>
     <div>
       <Menu />
-      <Switch>
-	      <Route exact path="/" component={App} />  
-        <Route path="/weather" component={Weather} /> 
+      <Switch> 
+        <Route exact path="/" component={App} /> 
         <Route path="/forecast" component={Forecast} /> 
-	      <Route path="/about" component={About}/>   
+        <Route path="/about" component={About}/>   
       </Switch>   
     </div>
   </HashRouter>,

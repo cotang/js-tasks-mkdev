@@ -20,7 +20,7 @@ class App extends Component {
         initialLat: position.coords.latitude,
         initialLng: position.coords.longitude
       })
-      this.loadLocationData(url, this.state.initialLat, this.state.initialLng)
+      this.loadLocationData(url, position.coords.latitude, position.coords.longitude)
     }
   }
   loadLocationData(url, lat, lng){
@@ -65,18 +65,18 @@ class App extends Component {
   render() {
     return (
       <div className="App">
-        {/*
+        {
         <Weather 
         	weatherData={this.state.weatherData}
         	setUrl={this.getLocation.bind(this)}
         	loadLocationWeather={this.loadLocationData.bind(this)} />
-          */}
-        {
+          }
+        {/*
         <Forecast 
 	        weatherData={this.state.weatherData}
           setUrl={this.getLocation.bind(this)}
 	        loadLocationForecast={this.loadLocationData.bind(this)} /> 
-        }
+        */}
       </div>
     );
   }
