@@ -8,16 +8,18 @@ class Weather extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      url: 'https://api.openweathermap.org/data/2.5/weather'
+      url: 'https://api.openweathermap.org/data/2.5/weather',
+      requestType: 'weather'
     };
   }
-  searchLocationWeather(value, url){
-    console.log(value, url)
-    this.props.loadLocationWeather(this.state.url, value);
+  searchLocationWeather(value){
+    console.log(value)
+    this.props.loadLocationWeather(this.state.url, value, this.state.requestType);
   }
 
   componentDidMount() {
-    this.props.setUrl(this.state.url);
+    this.props.setUrl(this.state.url, this.state.requestType);
+    console.log(this.state.url, this.state.requestType)
   }
   componentWillUnmount() {
     // this.mounted = false;

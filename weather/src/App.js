@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import './App.css';
-
+// second key e2ec8f1841289db691202c16b20afc35
 import { HashRouter, Route, Switch } from 'react-router-dom';
 
 import About from './About';
@@ -15,46 +15,79 @@ class App extends Component {
     this.state = {
       initialLat: null,
       initialLng: null,
+      location: null,
       weatherData: null,
+      forecastData: null,
+      requestType: null
     }
   }
-  setInitialPosition(url, position) {
+
+  getInitialLocation(url, requestType){
+    if (!this.state.location) {
+      console.log('new location')
+      navigator.geolocation.getCurrentPosition(this.setInitialPosition.bind(this, url, requestType));
+    } else {
+      console.log('use existing location')
+      // this.loadRequestData(url, this.state.location, requestType)
+    }
+  }
+  setInitialPosition(url, requestType, position) {
     console.log(url, position)
     if (this.mounted) {
       this.setState({
         initialLat: position.coords.latitude,
-        initialLng: position.coords.longitude
+        initialLng: position.coords.longitude,
+        requestType: requestType
       })
-      this.loadLocationData(url, position.coords.latitude, position.coords.longitude)
+      this.loadLocationData(url, requestType, position.coords.latitude, position.coords.longitude)
     }
   }
-  loadLocationData(url, lat, lng){
-    console.log('initial', url, lat, lng)
-    if (!this.state.weatherData) {      
+  loadLocationData(url, requestType, lat, lng){
+    console.log('initial', url, lat, lng, requestType, this.state.location)
+    if ((requestType === 'weather' && !this.state.weatherData) || (requestType === 'forecast' && !this.state.forecastData)) {      
       fetch(url+'?lat='+lat+'&lon='+lng+'&units=metric&APPID=36178c9fb4a5eb33442e9a88ec583af5')
         .then(res => { return res.json() })
         .then(res => { 
           console.log('res init', res)
-          this.setState({ 
-            weatherData: res
-          }) 
+          if (requestType === 'weather') { 
+            this.setState({ 
+              weatherData: res
+            }) 
+          } else if (requestType === 'forecast') {
+            this.setState({ 
+              forecastData: res
+            }) 
+          }
         });
     }
   }
-  loadRequestData(url, request){
-    console.log('request', url, request)
+
+  setLocation(url, request, requestType){
+    console.log(url, request)
+    this.setState({
+      location: request,
+      requestType: requestType
+    })
+    this.loadRequestData(url, request, requestType)
+  }
+  loadRequestData(url, request, requestType){
+    console.log('request', url, request, this.state.location)
+    // if ( request !== this.state.location && requestType !== this.state.requestType) { 
     fetch(url+'?q='+request+'&units=metric&APPID=36178c9fb4a5eb33442e9a88ec583af5')
       .then(res => { return res.json() })
       .then(res => { 
         console.log('res search', res)
-        this.setState({ 
-          weatherData: res
-        }) 
+        if (requestType === 'weather') { 
+          this.setState({ 
+            weatherData: res
+          }) 
+        } else if (requestType === 'forecast') {
+          this.setState({ 
+            forecastData: res
+          }) 
+        } 
       });
-  }
-  getLocation(url){
-    // console.log(url)
-    navigator.geolocation.getCurrentPosition(this.setInitialPosition.bind(this, url));
+    // }
   }
 
   componentDidMount() {
@@ -63,8 +96,6 @@ class App extends Component {
   componentWillUnmount() {
     this.mounted = false;
   }
-
-
 
 
   render() {
@@ -77,16 +108,16 @@ class App extends Component {
               component={({match}) => <Weather 
                 match={match} 
                 weatherData={this.state.weatherData}
-                setUrl={this.getLocation.bind(this)}
-                loadLocationWeather={this.loadRequestData.bind(this)}                
+                setUrl={this.getInitialLocation.bind(this)}
+                loadLocationWeather={this.setLocation.bind(this)}                
               />}
-            /> 
+            />
             <Route path="/forecast" 
               component={({match}) => <Forecast 
                 match={match}
-                weatherData={this.state.weatherData}
-                setUrl={this.getLocation.bind(this)}
-                loadLocationForecast={this.loadRequestData.bind(this)}
+                forecastData={this.state.forecastData}
+                setUrl={this.getInitialLocation.bind(this)}
+                loadLocationForecast={this.setLocation.bind(this)}
               />}
             />
             <Route path="/about" 

@@ -9,16 +9,18 @@ class Forecast extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      url: 'https://api.openweathermap.org/data/2.5/forecast'
+      url: 'https://api.openweathermap.org/data/2.5/forecast',
+      requestType: 'forecast'
     };
   }
-  searchLocationForecast(value, url){
-    console.log(value, url)
-    this.props.loadLocationForecast(this.state.url, value);
+  searchLocationForecast(value){
+    console.log(value)
+    this.props.loadLocationForecast(this.state.url, value, this.state.requestType);
   }
 
   componentDidMount() {
-    this.props.setUrl(this.state.url);
+    this.props.setUrl(this.state.url, this.state.requestType);
+    console.log(this.state.url, this.state.requestType)
   }
   componentWillUnmount() {
     // this.mounted = false;
@@ -26,8 +28,8 @@ class Forecast extends Component {
 
 
   render() {
-    let wD = this.props.weatherData;    
-
+    let wD = this.props.forecastData;    
+    
     if (wD) {  
   
       return (
