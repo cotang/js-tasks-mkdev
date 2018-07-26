@@ -5,9 +5,9 @@ function consoleOutput() {
 function mySetInterval(func, time){  
   let canceled = false;
 
-  function recursiveCount(fn, t){
-    func();
+  function recursiveCount(fn, t){    
     if (!canceled){
+      func();
       return setTimeout(recursiveCount, time);
     }
   }
@@ -27,4 +27,4 @@ let myClearInterval = msi.cancel
 // call clear function immediatelly
 // myClearInterval()
 // call clear function after 5 sec
-// setTimeout(myClearInterval, 5000)
+setTimeout(myClearInterval, 5000)
