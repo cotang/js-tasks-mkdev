@@ -1,5 +1,6 @@
-Install dependencies 
+Install dependencies <br>
 `npm i`
-Run webpack
+
+Run webpack<br>
 `npm run webpack`
 `npm start`
