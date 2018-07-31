@@ -8,8 +8,12 @@ app.use(express.static(__dirname +'./../public'));
 app.use('/public', express.static(path.resolve(__dirname, '../public')));
 
 app.get('*', function(req, res) {
-	res.sendFile(path.resolve(__dirname, 'index.html'));
+ res.sendFile(path.resolve(__dirname, 'index.html'));
 });
+// app.get('*', function(req, res) {
+//   renderLayout();
+// });
+
 
 app.listen(3000);
 
