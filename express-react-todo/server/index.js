@@ -12,26 +12,33 @@ app.use(bodyParser.json())
 app.use('/public', express.static(path.resolve(__dirname, '../public')));
 
 
-app.post('/api/todos', function(req, res) {
-  const todoitem = {
-    key: Date.now(),
-    title: req.body.title,
-    completed: false
+app.post('/api/todos', 
+  (req, res, next) => {
+    if (req.body.title != ''){
+      next();
+    } else {
+      res.status(404).send('Validation error'); 
+    }
+  },
+  (req, res, next) => {
+    const todoitem = {
+      key: Date.now(),
+      title: req.body.title,
+      completed: false
+    }
+    todolist.push(todoitem);
+    res.json(todolist);
   }
-  todolist.push(todoitem);
-  // res.json(todolist);
-});
+);
 
 app.put('/api/todos/:todoID', function(req, res) {
   const requestID = req.params.todoID.slice(1);
-  // console.log(todolist);
   todolist.forEach(item => {
     if (item.key == requestID){
       item.completed = !item.completed;
     }
   })
-  // res.json(todolist);
-  // console.log(todolist);
+  res.json(todolist);
 });
 
 app.delete('/api/todos/:todoID', function(req, res) {
@@ -41,9 +48,8 @@ app.delete('/api/todos/:todoID', function(req, res) {
     return item.key == requestID
   })[0];
   const index = todolist.indexOf(thisToDo); 
-  // console.log(todolist)
   todolist.splice(index, 1);
-  // res.json(todolist);
+  res.json(todolist);
 });
 
 app.get('/api/todos', function(req, res) {
@@ -56,8 +62,7 @@ app.get('*', function(req, res) {
 
 
 // errors
-app.use(function(err, req, res, next) {
-  console.error(err.stack);
+app.use(function(req, res, next) {
   res.status(404).send('not found'); 
 });
 app.use(function(err, req, res, next) {
@@ -66,3 +71,8 @@ app.use(function(err, req, res, next) {
 });
 
 app.listen(3000);
+
+
+
+
+

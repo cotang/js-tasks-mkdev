@@ -101,7 +101,10 @@ class ToDo extends Component {
       headers: {'Content-Type':'application/json'},
       body: JSON.stringify({ 'title': value })
     })
-    this.loadData();
+      .then(response => { return response.json() })
+      .then(response => {
+        this.setState({ list: response}) 
+      });
   }
 
   completeAction(item){
@@ -111,7 +114,10 @@ class ToDo extends Component {
       headers: {'Content-Type':'application/json'},
       body: JSON.stringify({ 'id': id })
     })
-    this.loadData();
+      .then(response => { return response.json() })
+      .then(response => {
+        this.setState({ list: response}) 
+      });
   }
   deleteAction(item){
     var id = item.key
@@ -120,7 +126,10 @@ class ToDo extends Component {
       headers: {'Content-Type':'application/json'},
       body: JSON.stringify({ 'id': id })
     })
-    this.loadData();
+      .then(response => { return response.json() })
+      .then(response => {
+        this.setState({ list: response}) 
+      });
   }
 
   changeFilter(str){
@@ -130,16 +139,12 @@ class ToDo extends Component {
   }
 
   componentDidMount() {
-    this.loadData();
-  }
-  loadData(){
     fetch('/api/todos')
       .then(response => { return response.json() })
       .then(response => {
         this.setState({ list: response}) 
       });
   }
-
 
   render() {
 
