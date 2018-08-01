@@ -83,79 +83,6 @@ class FilterSection extends React.Component {
 }
 
 
-function compareDateAsc(a, b) {
-  return a.num - b.num;
-}
-function compareDateDesc(a, b) {
-  return b.num - a.num;
-}
-function compareTitleAsc(a, b) {
-  if (a.title.toLowerCase() > b.title.toLowerCase())
-    return 1;
-  if (a.title.toLowerCase() < b.title.toLowerCase())
-    return -1;
-  else
-    return 0;
-}
-function compareTitleDesc(a, b) {
-  if (a.title.toLowerCase() > b.title.toLowerCase())
-    return -1;
-  if (a.title.toLowerCase() < b.title.toLowerCase())
-    return 1;
-  else
-    return 0;
-}
-function compareActive(a, b) {
-  return a.completed - b.completed;
-}
-function compareCompleted(a, b) {
-  return b.completed - a.completed;
-}
-
-class SortSection extends React.Component {
-  constructor(){
-    super();
-    this.state = {
-      sortings: [
-        {'title': 'Date asc', 'function': compareDateAsc, checked: true},
-        {'title': 'Date desc', 'function': compareDateDesc, checked: false},
-        {'title': 'Title asc', 'function': compareTitleAsc, checked: false},
-        {'title': 'Title desc', 'function': compareTitleDesc, checked: false}, 
-        {'title': 'Active first', 'function': compareActive, checked: false},
-        {'title': 'Completed first', 'function': compareCompleted, checked: false}, 
-      ],
-    }
-  }
-
-  handleSorting(fn, index){
-    this.props.onChangeSorting(fn);
-    
-    var newSortings = this.state.sortings.slice();
-    newSortings.forEach(function(item) {
-      item.checked = false;
-    });
-    newSortings[index].checked = true;
-    this.setState({
-      sortings: newSortings
-    })
-  }
-
-  render() {
-    return (
-      <div className="mb-3 sorting">
-        <ButtonGroup>
-          {this.state.sortings.map((item, index) =>
-            <Button color={item.checked ? "secondary" : "default"} onClick={this.handleSorting.bind(this, item.function, index)} key={index}>
-              {item.title}
-            </Button>
-          )}
-        </ButtonGroup>
-      </div>
-    );
-  }
-}
-
-
 class ToDo extends Component {
   constructor(){
     super();
@@ -163,35 +90,37 @@ class ToDo extends Component {
       list: [],
       filter: ''
     }
-    this.addAction = this.addAction.bind(this);
-    this.changeFilter = this.changeFilter.bind(this);
-    this.useSorting = this.useSorting.bind(this);
   }
 
   addAction(value) {
     if (value === ''){
       return;
     }
-    this.setState({      
-      list: [...this.state.list, {'title':value, 'key': Date.now(), 'completed':false}],
+    fetch('/api/todos', {
+      method: 'post',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ 'title': value })
     })
+    this.loadData();
   }
 
-  completeAction(index, item){
-    var newList = this.state.list.slice();
-    var key = newList.indexOf(item);
-    newList[key].completed = !(newList[key].completed);
-    this.setState({
-      list: newList
+  completeAction(item){
+    var id = item.key
+    fetch('/api/todos/:'+id, {
+      method: 'put',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ 'id': id })
     })
+    this.loadData();
   }
-  deleteAction(index, item){
-    var newList = this.state.list.slice();
-    var key = newList.indexOf(item);
-    newList.splice(key, 1);
-    this.setState({
-      list: newList
+  deleteAction(item){
+    var id = item.key
+    fetch('/api/todos/:'+id, {
+      method: 'delete',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ 'id': id })
     })
+    this.loadData();
   }
 
   changeFilter(str){
@@ -200,50 +129,56 @@ class ToDo extends Component {
     })
   }
 
-  useSorting(fn){
-    var newList = this.state.list.slice();
-    newList.sort(fn);
-    this.setState({
-      list: newList
-    })
+  componentDidMount() {
+    this.loadData();
+  }
+  loadData(){
+    fetch('/api/todos')
+      .then(response => { return response.json() })
+      .then(response => {
+        this.setState({ list: response}) 
+      });
   }
 
+
   render() {
-    let list = this.state.list;
-    if (this.state.filter === 'completed') {
-      list = list.filter(function(item) { return item.completed; });
-    } else if (this.state.filter === 'active') {
-      list = list.filter(function(item) { return !item.completed; });
-    }
 
-    return (
-      <div className="to-do">
-        <h1 className="to-do__title mb-3">To-do list</h1>
+      let list = this.state.list;
+      if (this.state.filter === 'completed') {
+        list = list.filter(function(item) { return item.completed; });
+      } else if (this.state.filter === 'active') {
+        list = list.filter(function(item) { return !item.completed; });
+      }
 
-        <InputSection onAddToList={this.addAction} />
+      return (
+        <div className="to-do">
+          <h1 className="to-do__title mb-3">To-do list</h1>
+          
+          <InputSection onAddToList={this.addAction.bind(this)} />
 
-        <ListGroup className="to-do__list mb-3" id="to-do__list">
-          {list.map((item, index) =>
-            <ListGroupItem className={item.completed ? "to-do__item to-do__item--completed" : "to-do__item"} key={index}>
-              <p className="to-do__text" >{item.title}</p>
-              <ButtonGroup>
-                <Button onClick={this.completeAction.bind(this, index, item)}>
-                  <span className="color green">&#10004;</span>{item.completed ? 'Uncomplete' : 'Complete'} action
+          <ListGroup className="to-do__list mb-3" id="to-do__list">
+            {list.map((item, index) =>
+              <ListGroupItem className={item.completed ? "to-do__item to-do__item--completed" : "to-do__item"} key={index}>
+                <p className="to-do__text" >{item.title}</p>
+                <ButtonGroup>
+                  <Button onClick={this.completeAction.bind(this, item)}>
+                    <span className="color green">&#10004;</span>{item.completed ? 'Uncomplete' : 'Complete'} action
+                    </Button>
+                  <Button onClick={this.deleteAction.bind(this, item)}>
+                    <span className="color red">&#10008;</span>Delete action
                   </Button>
-                <Button onClick={this.deleteAction.bind(this, index, item)}>
-                  <span className="color red">&#10008;</span>Delete action
-                </Button>
-              </ButtonGroup>
-            </ListGroupItem>
-          )}
-        </ListGroup>
+                </ButtonGroup>
+              </ListGroupItem>
+            )}
+          </ListGroup>
 
-        <FilterSection onChangeFilter={this.changeFilter} />
+          <FilterSection onChangeFilter={this.changeFilter.bind(this)} />
 
-        {/* <SortSection onChangeSorting={this.useSorting} />  */}
+        </div>
+      )
 
-      </div>
-    );
+
+
   }
 }
 
