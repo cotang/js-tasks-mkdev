@@ -141,7 +141,7 @@ class ToDo extends Component {
   componentDidMount() {
     fetch('/api/todos')
       .then(response => { 
-        console.log(response.json())
+        // console.log(response.json())
         return response.json() })
       .then(response => {
         this.setState({ list: response}) 
