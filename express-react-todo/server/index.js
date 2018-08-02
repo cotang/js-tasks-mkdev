@@ -1,15 +1,39 @@
 var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
+var fs = require('fs');
 var bodyParser = require('body-parser');
 var app = express();
 var {renderLayout} = require('../templates/index.js');
 // var todolist = [{key: 1533129828864, title: 'Test', completed: false}];
-var todolist = [];
+// var todolist = [];
 
 app.use(bodyParser.json())
 
 app.use('/public', express.static(path.resolve(__dirname, '../public')));
+
+
+// fs.writeFile('public/todo.json', JSON.stringify({obj}), function (err) {
+//   if (err) throw err;
+//   console.log('Saved!');
+// });
+// var obj;
+// fs.readFile('public/todo.json', 'utf8', function (err, data) {
+//   if (err) throw err;
+//   obj = JSON.parse(data);
+//   console.log(obj)
+// });
+
+app.get('/api/todos', function(req, res) {
+  // read data
+  let todolist;
+  fs.readFile('public/todo.json', 'utf8', function (err, data) {
+    if (err) throw err;
+    todolist = JSON.parse(data);
+    console.log(todolist)
+    res.json(todolist);
+  });
+});
 
 
 app.post('/api/todos', 
@@ -26,13 +50,26 @@ app.post('/api/todos',
       title: req.body.title,
       completed: false
     }
-    todolist.push(todoitem);
-    res.json(todolist);
+    // read data
+    let todolist;
+    fs.readFile('public/todo.json', 'utf8', function (err, data) {
+      if (err) throw err;
+      todolist = JSON.parse(data);
+      console.log(todolist)
+      todolist.push(todoitem);
+
+      // write data
+      fs.writeFile('public/todo.json', JSON.stringify(todolist, null, '\t'), function (err) {
+        if (err) throw err;
+        console.log(JSON.stringify(todolist))
+      });
+      res.json(todolist);
+    });   
   }
 );
 
 app.put('/api/todos/:todoID', function(req, res) {
-  const requestID = req.params.todoID.slice(1);
+  const requestID = req.params.todoID;
   todolist.forEach(item => {
     if (item.key == requestID){
       item.completed = !item.completed;
@@ -42,17 +79,12 @@ app.put('/api/todos/:todoID', function(req, res) {
 });
 
 app.delete('/api/todos/:todoID', function(req, res) {
-  const requestID = req.params.todoID.slice(1);
-  // console.log(req.body, req.params.todoID, requestID)
+  const requestID = req.params.todoID;
   let thisToDo = todolist.filter(item => {
     return item.key == requestID
   })[0];
   const index = todolist.indexOf(thisToDo); 
   todolist.splice(index, 1);
-  res.json(todolist);
-});
-
-app.get('/api/todos', function(req, res) {
   res.json(todolist);
 });
 

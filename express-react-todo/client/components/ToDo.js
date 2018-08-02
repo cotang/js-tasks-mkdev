@@ -70,13 +70,13 @@ class FilterSection extends React.Component {
   render() {
     return (
       <div className="mb-3 filters">
-        <ButtonGroup>
+        <div>
           {this.state.filters.map((item, index) =>
-            <Button color={item.checked ? "secondary" : "default"} onClick={this.handleFilter.bind(this, item.filter, index)} key={index}>
+            <button className={item.checked ? "m-1 btn btn-primary" : "m-1 btn btn-outline-secondary"} onClick={this.handleFilter.bind(this, item.filter, index)} key={index}>
               {item.title}
-            </Button>
+            </button>
           )}
-        </ButtonGroup>
+        </div>
       </div>
     );
   }
@@ -92,7 +92,7 @@ class ToDo extends Component {
     }
   }
 
-  addAction(value) {
+  add(value) {
     if (value === ''){
       return;
     }
@@ -107,9 +107,9 @@ class ToDo extends Component {
       });
   }
 
-  completeAction(item){
+  complete(item){
     var id = item.key
-    fetch('/api/todos/:'+id, {
+    fetch('/api/todos/'+id, {
       method: 'put',
       headers: {'Content-Type':'application/json'},
       body: JSON.stringify({ 'id': id })
@@ -119,9 +119,9 @@ class ToDo extends Component {
         this.setState({ list: response}) 
       });
   }
-  deleteAction(item){
+  delete(item){
     var id = item.key
-    fetch('/api/todos/:'+id, {
+    fetch('/api/todos/'+id, {
       method: 'delete',
       headers: {'Content-Type':'application/json'},
       body: JSON.stringify({ 'id': id })
@@ -140,7 +140,9 @@ class ToDo extends Component {
 
   componentDidMount() {
     fetch('/api/todos')
-      .then(response => { return response.json() })
+      .then(response => { 
+        console.log(response.json())
+        return response.json() })
       .then(response => {
         this.setState({ list: response}) 
       });
@@ -159,23 +161,27 @@ class ToDo extends Component {
         <div className="to-do">
           <h1 className="to-do__title mb-3">To-do list</h1>
           
-          <InputSection onAddToList={this.addAction.bind(this)} />
+          <InputSection onAddToList={this.add.bind(this)} />
 
-          <ListGroup className="to-do__list mb-3" id="to-do__list">
-            {list.map((item, index) =>
-              <ListGroupItem className={item.completed ? "to-do__item to-do__item--completed" : "to-do__item"} key={index}>
-                <p className="to-do__text" >{item.title}</p>
-                <ButtonGroup>
-                  <Button onClick={this.completeAction.bind(this, item)}>
-                    <span className="color green">&#10004;</span>{item.completed ? 'Uncomplete' : 'Complete'} action
+          { (this.state.list.length != 0) ?
+            <ListGroup className="to-do__list mb-3" id="to-do__list">
+              {list.map((item, index) =>
+                <ListGroupItem className={item.completed ? "to-do__item to-do__item--completed" : "to-do__item"} key={index}>
+                  <p className="to-do__text" >{item.title}</p>
+                  <ButtonGroup>
+                    <Button onClick={this.complete.bind(this, item)}>
+                      <span className="color green">&#10004;</span>{item.completed ? 'Uncomplete' : 'Complete'} action
+                      </Button>
+                    <Button onClick={this.delete.bind(this, item)}>
+                      <span className="color red">&#10008;</span>Delete action
                     </Button>
-                  <Button onClick={this.deleteAction.bind(this, item)}>
-                    <span className="color red">&#10008;</span>Delete action
-                  </Button>
-                </ButtonGroup>
-              </ListGroupItem>
-            )}
-          </ListGroup>
+                  </ButtonGroup>
+                </ListGroupItem>
+              )}
+            </ListGroup>
+          :
+            <div className="text-center mt-2 mb-3">No items</div>
+          }
 
           <FilterSection onChangeFilter={this.changeFilter.bind(this)} />
 
