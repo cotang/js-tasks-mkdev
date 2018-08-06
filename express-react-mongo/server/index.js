@@ -16,75 +16,15 @@ const url = 'mongodb://localhost:27017/todos';
 const dbName = 'todos';
 
 
-
-const findTodos = function(db, res, callback) {
-  // Get the todos collection
-  const collection = db.collection('todos');
-  // Find some todos
-  collection.find({}).toArray(function(err, list) {
-    assert.equal(err, null);
-    console.log("Found the following records");
-    callback(list);
-    console.log(list);
-    res.json(list);
-  });
-}
-
-const insertTodo = function(db, newElem, callback) {
-  // Get the todos collection
-  const collection = db.collection('todos');
-  // Insert some todo
-  collection.insertOne(newElem, function(err, result) {
-    assert.equal(err, null);
-    assert.equal(1, result.result.n);
-    assert.equal(1, result.ops.length);
-    console.log("Inserted new data into the collection");
-    callback(result);
-  });
-}
-
-const updateTodo = function(db, elem, callback) {
-  // Get the todos collection
-  const collection = db.collection('todos');
-
-  var doc = collection.findOne(elem.completed);
-  console.log(collection, elem)
-
-  // Update document
-  collection.updateOne(elem, { $set: { completed : !elem.completed } }, function(err, result) {
-    assert.equal(err, null);
-    assert.equal(1, result.result.n);
-    console.log("Updated the todo");
-    callback(result);
-  });  
-}
-
-const removeTodo = function(db, elem, callback) {
-  console.log(elem)
-  // Get the todos collection
-  const collection = db.collection('todos');
-  // Delete todo
-  collection.deleteOne(elem, function(err, result) {
-    assert.equal(err, null);
-    assert.equal(1, result.result.n);
-    console.log("Removed the todo");
-    callback(result);
-  });    
-}
-
-
 app.use(bodyParser.json())
 
 app.use('/public', express.static(path.resolve(__dirname, '../public')));
 
 app.get('/api/todos', function(req, res) {
 
-  // Use connect method to connect to the server
-  MongoClient.connect(url, function(err, client) {
-    assert.equal(null, err);
-    console.log("Connected correctly to server");
-    const db = client.db(dbName);
-    findTodos(db, res, function() {
+  MongoClient.connect(url, function(err, client){
+    client.db('todos').collection('todos').find({}).toArray(function(err, list){
+      res.send(list);
       client.close();
     });
   });
@@ -105,53 +45,57 @@ app.post('/api/todos',
       title: req.body.title,
       completed: false
     }
+     
+    MongoClient.connect(url, function(err, client){
+      var collection = client.db('todos').collection('todos');
+      collection.insertOne(todoItem, function(err, result){
+        if(err) return res.status(400).send();
 
-    // Use connect method to connect to the server
-    MongoClient.connect(url, function(err, client) {
-      assert.equal(null, err);
-      console.log("Connected correctly to server");
-      const db = client.db(dbName);
-      insertTodo(db, todoItem, function() {
-        findTodos(db, res, function() {
-          client.close();
+        collection.find({}).toArray(function(err, list){
+          res.send(list);
         });
+
+        client.close();
       });
     });
 
   }
 );
 
+
 app.put('/api/todos/:todoID', function(req, res) {
   const requestID = Number(req.params.todoID);
-  let todoItem = {key: requestID}
+  let newStatus = !req.body.completed;
 
-  // Use connect method to connect to the server
-  MongoClient.connect(url, function(err, client) {
-    assert.equal(null, err);
-    console.log("Connected correctly to server");
-    const db = client.db(dbName);
-    updateTodo(db, todoItem, function() {
-      findTodos(db, res, function() {
-        client.close();
+  MongoClient.connect(url, function(err, client){
+    var collection = client.db('todos').collection('todos');
+    collection.findOneAndUpdate({key: requestID}, { $set: { completed: newStatus}}, {returnOriginal: false },function(err, result){
+      if(err) return res.status(400).send();
+        
+      collection.find({}).toArray(function(err, list){
+        res.send(list);
       });
+
+      client.close();
     });
   });
 
 });
 
+
 app.delete('/api/todos/:todoID', function(req, res) {
   const requestID = Number(req.params.todoID);
-  let todoItem = {key: requestID}
 
-  // Use connect method to connect to the server
-  MongoClient.connect(url, function(err, client) {
-    assert.equal(null, err);
-    console.log("Connected correctly to server");
-    const db = client.db(dbName);
-    removeTodo(db, todoItem, function() {
-      findTodos(db, res, function() {
-        client.close();
+  MongoClient.connect(url, function(err, client){
+    var collection = client.db('todos').collection('todos');
+    collection.findOneAndDelete({key: requestID}, function(err, result){
+      if(err) return res.status(400).send();
+
+      collection.find({}).toArray(function(err, list){
+        res.send(list);
       });
+
+      client.close();
     });
   });
 

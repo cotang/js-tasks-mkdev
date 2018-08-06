@@ -108,11 +108,12 @@ class ToDo extends Component {
   }
 
   complete(item){
-    var id = item.key
+    var id = item.key;
+    var completed = item.completed;
     fetch('/api/todos/'+id, {
       method: 'put',
       headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({ 'id': id })
+      body: JSON.stringify({ 'id': id, 'completed': completed })
     })
       .then(response => { return response.json() })
       .then(response => {
